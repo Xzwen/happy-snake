@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+		    #myCanvas{
+		 
+		    	border: 1px solid purple;
+		    }
+		</style>
+	</head>
+	<body>
+		<canvas id="myCanvas" width="600" height="600"></canvas>
+	</body>
+	<script type="text/javascript" charset="utf-8">
+	    var canvas = document.querySelector("#myCanvas");
+	    var ctx = canvas.getContext("2d");
+	    var canvasW = canvas.width;
+	    var canvasH = canvas.height;
+	    
+	    
+	    var snakel, snaker,snaket,snakeb;
+	    var foodl,foodr,foodt,foodb;
+	    
+	    var runID;
+	    
+	    function Snake(){
+	    	this.snakeW = 30;
+	    	this.snakeH = 30;
+	    	this.snakeColor = "red";
+	    	this.snakeX = randomNum(100,500);
+	    	this.snakeY = randomNum(100,500);
+	    	this.moveLeft = false;
+	    	this.moveRight = true;
+	    	this.moveTop = false;
+	    	this.moveBottom = false;
+	    	//蛇的长度
+	    	this.snakeBody = [];
+	    	this.num = 5;
+	    }
+	    Snake.prototype = {
+	    	constructor : Snake,
+	    	//绘制
+	    	draw : function(){	    		
+	    		
+//	    		ctx.fillStyle = this.snakeColor;
+//	    		ctx.fillRect(this.snakeX,this.snakeY, this.snakeW,this.snakeH);	    		
+//	    		ctx.fill();
+	    		
+
+	
+	    	},
+	    	//移动
+	    	move : function(){
+	    		var self = this;
+	    		function running(){
+
+						    			
+	    			
+	    			//控制蛇的方向   ---与改变蛇的方向相对应
+	    			if(self.moveLeft){
+	    				self.snakeX -= self.snakeW;
+	    			}
+	    			if(self.moveRight){
+	    				self.snakeX += self.snakeW;
+	    			}
+	    			if(self.moveTop){
+	    				self.snakeY -= self.snakeW;
+	    			}
+	    			if(self.moveBottom){
+	    				self.snakeY += self.snakeW;
+	    			}	    			
+					
+					//绘制蛇身
+					var initBody ={
+		    			bodyW : 30,
+		    			bodyH : 30,
+						x : self.snakeX,
+						y : self.snakeY
+		    			
+		    		}
+		    		self.snakeBody.push(initBody);
+		    		if(self.snakeBody.length>self.num){
+		    			self.snakeBody.shift();
+		    		}
+	    			ctx.clearRect(0,0,canvasW,canvasH);
+	    			ctx.fillStyle = "#008000";
+	    			
+	    			for(var ele of self.snakeBody){
+	    				ctx.fillRect(ele.x , ele.y , ele.bodyW , ele.bodyH);
+	    				ctx.fill();
+	    			}	    		
+		    		
+		    		//绘制蛇头
+	    			ctx.fillStyle = self.snakeColor;
+	    			ctx.fillRect(self.snakeX,self.snakeY, self.snakeW,self.snakeH);	    		
+	    			ctx.fill();	
+	    		}
+	    		
+	    		runID = setInterval(running , 100);
+	    		
+	    		document.onkeydown = function(ele){
+	    			
+	    			var key = ele.keyCode;
+	    			switch(key){
+	    				case 37:
+	    				//控制蛇不能按反方向
+	    					if(self.moveRight){
+	    						return;
+	    					}
+	    				//改变蛇的方向	
+	    					self.moveLeft = true;
+	    					self.moveRight = false;
+	    					self.moveTop = false;
+	    					self.moveBottom = false;
+	    				break;	
+	    				case 38:
+	    					if(self.moveBottom){
+	    						return;
+	    					}	    				
+	    					self.moveLeft = false;
+	    					self.moveRight = false;
+	    					self.moveTop = true;
+	    					self.moveBottom = false;
+	    				break;		
+	    				case 39:
+	    					if(self.moveLeft){
+	    						return;
+	    					}	    				
+	    					self.moveLeft = false;
+	    					self.moveRight = true;
+	    					self.moveTop = false;
+	    					self.moveBottom = false;
+	    				break;	
+	    				case 40:
+	    					if(self.moveTop){
+	    						return;
+	    					}	    				
+	    					self.moveLeft = false;
+	    					self.moveRight = false;
+	    					self.moveTop = false;
+	    					self.moveBottom = true;
+	    				break;
+	    				
+	    				
+	    			}
+	    			
+	    		}
+	    		
+
+	    	},
+	    	food : function(){
+	    		var self2 = this;
+	    			var foodX;
+	    			var foodY;
+	    			var foodW;
+	    			var foodH;
+	    		function rand(){
+	    			foodX = randomNum(0,550);
+	    			foodY = randomNum(0,550);
+	    			foodW = randomNum(10,30);
+	    			foodH = randomNum(10,30);
+	    			
+				}
+	    		var timeoutID = setTimeout(rand , 1);
+	    		
+	    		function randFood(){
+	    			ctx.fillStyle = "#FF0000";	    			
+	    			ctx.fillRect(foodX, foodY , foodW , foodH);
+	    			ctx.fill();
+
+
+		    		//判断碰撞
+		    		snakel = self2.snakeX;
+					snaket = self2.snakeY;
+					snaker = snakel+self2.snakeW;
+					snakeb = snaket+self2.snakeH;
+					
+					foodl = foodX;
+					foodt = foodY;
+					foodr = foodl+foodW;
+					foodb = foodt+foodH;	
+
+					if(snakel>foodr || snaket>foodb || snaker<foodl || snakeb<foodt){
+					}else{
+						timeoutID = setTimeout(rand , 1);
+						self2.num++;
+					}
+					
+					if(self2.snakeX<=0 || self2.snakeY<=0 || self2.snakeX>=canvasW ||self2.snakeY>=canvasH){
+						alert("GAME OVER");
+						clearInterval(timeID);
+						clearInterval(runID);
+					}
+	    		}
+	    		var timeID = setInterval(randFood , 100);
+
+	
+	    	},
+	    	
+	    }
+	    
+	    var happySnake = new Snake();
+//	    happySnake.draw();
+	    happySnake.move();
+	    happySnake.food();
+	    
+	    
+//		    		jugdeLocation(
+//		    			{lt:self2.snakeX,tp:self2.snakeY,wt:self2.snakeW,ht:self2.snakeH},
+//		    			{lt2:foodX, tp2:foodY, wt2:foodW, ht2:foodH}
+//		    		);		    	    
+//	function jugdeLocation(foodObj , snakeObj){
+//			snakel = snakeObj.lt;
+//			snaket = snakeObj.tp;
+//			snaker = snakel+snakeObj.wt;
+//			snakeb = snaket+snakeObj.ht;
+//			
+//			foodl = foodObj.lt2;
+//			foodt = foodObj.tp2;
+//			foodr = foodl+foodObj.wt2;
+//			foodb = foodt+foodObj.ht2;		
+//	}
+	 
+    function randomNum(from,to){
+        return parseInt(Math.random()*(to-from+1)+from);
+    }	    
+	</script>
+</html>
